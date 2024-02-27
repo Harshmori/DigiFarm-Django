@@ -1,0 +1,44 @@
+<!-- <div class="dropdown-container"> 
+        <form method="POST">
+          <label class="label" for="district">District:</label>
+          <select name="district" id="district">
+            <option value="">Select District</option>
+            {% for district in districts%}
+              <option value="{{ district[0] }}">{{ district[0] }}</option>
+            {% endfor %}
+          </select>
+
+          <label class="label" for="market">Market:</label>
+          <select name="market" id="market">
+            <option value="">Select Market</option>
+            {% for market in markets %}
+              <option value="{{ market[0] }}">{{ market[0] }}</option>
+            {% endfor %}
+          </select>
+
+          <label class="label" for="commodity">Commodity:</label>
+          <select name="commodity" id="commodity">
+            <option value="">Select Commodity</option>
+            {% for commodity in commodities %}
+              <option value="{{ commodity[0] }}">{{ commodity[0] }}</option>
+            {% endfor %}
+          </select>
+
+          <label class="label" for="date">Date:</label>
+          <select name="date" id="date">
+            <option value="">Select Date</option>
+            {% for date in dates %}
+              <option value="{{ date[0].strftime('%Y-%m-%d') }}">{{ date[0].strftime('%d / %m / %Y') }}</option>
+            {% endfor %}
+          </select>
+
+          <button type="submit">Submit</button>
+        </form>
+      </div> -->
+
+       <!-- <th>Graph</th> -->
+                   <!-- <td><a href="{{ url_for('graph.graph', commodity=price.1, market=price.2, district=price.3) }}"><svg class="graph-icon"><use xlink:href="#graph-icon"></use></svg></a></td> -->
+
+
+                   <th>Graph</th>
+                   <td style="text-align: center;"><a href="{{ url_for('graph.graph', commodity=commodity[1], market=selected_market, district=selected_district) }}"><svg class="graph-icon"><use xlink:href="#graph-icon"></use></svg></a></td>

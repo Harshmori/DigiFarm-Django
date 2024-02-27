@@ -1,0 +1,14 @@
+{
+    "builds": [
+      {
+        "src": "digifarm/wsgi.py",
+        "use": "@vercel/python"
+      }
+    ],
+    "routes": [
+      {
+        "src": "/(.*)",
+        "dest": "digifarm/wsgi.py"
+      }
+    ]
+}
