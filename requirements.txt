@@ -10,3 +10,4 @@ setuptools
 sqlparse
 tzdata
 urllib3
+matplotlib
