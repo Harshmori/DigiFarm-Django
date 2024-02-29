@@ -10,5 +10,12 @@
         "src": "/(.*)",
         "dest": "digifarm/wsgi.py"
       }
+    ],
+    "crons": [
+      {
+        "path": "/daily_prices/management/commands/fetch_data.py",
+        "schedule": "30 10 * * *"
+      }
     ]
+
 }

@@ -187,6 +187,7 @@ td:last-child {
         <th>Commodity</th>
         <th>Min Price</th>
         <th>Max Price</th>
+        <th>Graph</th>
       </tr>
     </thead>
     <tbody>
@@ -196,6 +197,8 @@ td:last-child {
           <td>{{ commodity.commodity }}</td>
           <td>{{ commodity.min_price }}</td>
           <td>{{ commodity.max_price }}</td>
+          <td><a href="graph/?district={{ district }}&market={{ market }}&commodity={{commodity.commodity}}"><svg class="graph-icon"><use xlink:href="#graph-icon"></use></svg></a></td> 
+
         </tr>
       {% endfor %}
     </tbody>
@@ -205,7 +208,7 @@ td:last-child {
       <h2>Markets in {{ district }}:</h2>
       <ul class="market-list">
         {% for market in markets %}
-          <li><a href="{% url 'mobile_view_market' district=district market=market %}">{{ market }}</a></li>
+          <li><a href="?district={{ district }}&market={{ market }}">{{ market }}</a></li>
         {% endfor %}
       </ul>
     </div>
@@ -215,7 +218,7 @@ td:last-child {
     <h2>Select District:</h2>
     <ul class="district-list">
       {% for district in districts %}
-        <li><a href="{% url 'mobile_view_district' district=district %}">{{ district }}</a></li>
+        <li><a href="?district={{ district }}">{{ district }}</a></li>
       {% endfor %}
     </ul>
   </div>

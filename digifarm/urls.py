@@ -9,7 +9,8 @@ urlpatterns = [
     path('fetch/', fetch_and_store_data, name='fetch_data'),
     # path('search/', search_prices, name='search_prices'),
     path('mobile/', mobile_view, name='mobile_view'),
-    path('mobile/<str:district>/', mobile_view, name='mobile_view_district'),
-    path('mobile/<str:district>/<str:market>/', mobile_view, name='mobile_view_market'),
+    path('graph/', graph, name='graph'),
+    # path('mobile/<str:district>/', mobile_view, name='mobile_view_district'),
+    # path('mobile/<str:district>/<str:market>/', mobile_view, name='mobile_view_market'),
 
 ]

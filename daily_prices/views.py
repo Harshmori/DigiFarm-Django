@@ -5,6 +5,9 @@ from .models import Price
 from django.db.utils import IntegrityError
 from django.shortcuts import render
 from datetime import date, timedelta
+import matplotlib.pyplot as plt
+import io
+import base64
 
 import environ
 env = environ.Env()
@@ -32,7 +35,7 @@ def fetch_and_store_data(request):
             state = result.get('state', '')
             min_price = result.get('min_price', 0)
             max_price = result.get('max_price', 0)
-            modal_price = result.get('modal_price', 0)
+            model_price = result.get('model_price', 0)
             arrival_date_str = result.get('arrival_date', '')
             arrival_date = datetime.strptime(arrival_date_str, '%d/%m/%Y').date()
 
@@ -43,7 +46,7 @@ def fetch_and_store_data(request):
                 state=state,
                 min_price=min_price,
                 max_price=max_price,
-                model_price=modal_price,
+                model_price=model_price,
                 arrival_date=arrival_date
             )
         except IntegrityError:
@@ -126,7 +129,10 @@ def desktop_view(request):
     return render(request, 'desktop/index.html', context)
 
 
-def mobile_view(request, district=None, market=None):
+def mobile_view(request):
+    district = request.GET.get('district')
+    market = request.GET.get('market')
+    
     if district is None:
         districts = Price.objects.values_list('district', flat=True).distinct()
         context = {'districts': districts}
@@ -138,3 +144,29 @@ def mobile_view(request, district=None, market=None):
         context = {'district': district, 'market': market, 'commodities': commodities}
 
     return render(request, 'mobile/index.html', context)
+
+
+def graph(request):
+
+    commodity = request.GET.get('commodity')
+    market = request.GET.get('market')
+    district = request.GET.get('district')
+
+    prices = Price.objects.filter(commodity=commodity, market=market, district=district).order_by('arrival_date')[:10]
+    dates = [price.arrival_date.strftime("%d %b %Y") for price in prices]
+    prices = [price.model_price / 5 for price in prices]
+    plt.figure(figsize=(10, 6))
+    plt.plot(dates, prices, marker='o', linestyle='-', linewidth=2, markersize=6, color='steelblue')
+    plt.xlabel('Date')
+    plt.ylabel('Model Price (20 kg)')
+    plt.title(f'{commodity} Prices in {market}, {district}')
+    plt.grid(True, linestyle='--', linewidth=0.5, alpha=0.7, color='lightgray')
+    plt.xticks(rotation=45)
+    plt.tight_layout()
+
+    buffer = io.BytesIO()
+    plt.savefig(buffer, format='png')
+    buffer.seek(0)
+    image_data = base64.b64encode(buffer.getvalue()).decode()
+
+    return render(request, 'desktop/graph.html', {'commodity': commodity, 'market': market, 'district': district, 'image_data': image_data})
