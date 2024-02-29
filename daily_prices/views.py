@@ -13,6 +13,17 @@ import environ
 env = environ.Env()
 environ.Env.read_env()
 
+from django.db import IntegrityError
+
+from django.http import HttpResponse
+from django.db.utils import IntegrityError
+from .models import Price
+from datetime import datetime
+import requests
+import os
+
+from django.db import IntegrityError
+
 def fetch_and_store_data(request):
     endpoint = 'https://api.data.gov.in/catalog/6141ea17-a69d-4713-b600-0a43c8fd9a6c'
     api_key = env('DATA_API')
@@ -27,32 +38,39 @@ def fetch_and_store_data(request):
     response = requests.get(endpoint, params=params)
     data = response.json()
 
+    records_to_create = []
     for result in data['records']:
-        try:
-            commodity = result.get('commodity', '')
-            market = result.get('market', '')
-            district = result.get('district', '')
-            state = result.get('state', '')
-            min_price = result.get('min_price', 0)
-            max_price = result.get('max_price', 0)
-            model_price = result.get('model_price', 0)
-            arrival_date_str = result.get('arrival_date', '')
-            arrival_date = datetime.strptime(arrival_date_str, '%d/%m/%Y').date()
+        commodity = result.get('commodity', '')
+        market = result.get('market', '')
+        district = result.get('district', '')
+        state = result.get('state', '')
+        min_price = result.get('min_price', 0)
+        max_price = result.get('max_price', 0)
+        modal_price = result.get('modal_price', 0)
+        arrival_date_str = result.get('arrival_date', '')
+        arrival_date = datetime.strptime(arrival_date_str, '%d/%m/%Y').date()
 
-            Price.objects.create(
-                commodity=commodity,
-                market=market,
-                district=district,
-                state=state,
-                min_price=min_price,
-                max_price=max_price,
-                model_price=model_price,
-                arrival_date=arrival_date
-            )
-        except IntegrityError:
-            pass
+        record = Price(
+            commodity=commodity,
+            market=market,
+            district=district,
+            state=state,
+            min_price=min_price,
+            max_price=max_price,
+            modal_price=modal_price,
+            arrival_date=arrival_date
+        )
+        records_to_create.append(record)
+
+    # Use bulk_create with ignore_conflicts=True to insert all records at once
+    Price.objects.bulk_create(records_to_create, ignore_conflicts=True)
+    print('!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!')
 
     return HttpResponse("Data fetched and stored successfully.")
+
+
+
+
 
 
 def index(request):
@@ -154,11 +172,11 @@ def graph(request):
 
     prices = Price.objects.filter(commodity=commodity, market=market, district=district).order_by('arrival_date')[:10]
     dates = [price.arrival_date.strftime("%d %b %Y") for price in prices]
-    prices = [price.model_price / 5 for price in prices]
+    prices = [price.modal_price / 5 for price in prices]
     plt.figure(figsize=(10, 6))
     plt.plot(dates, prices, marker='o', linestyle='-', linewidth=2, markersize=6, color='steelblue')
     plt.xlabel('Date')
-    plt.ylabel('Model Price (20 kg)')
+    plt.ylabel('Modal Price (20 kg)')
     plt.title(f'{commodity} Prices in {market}, {district}')
     plt.grid(True, linestyle='--', linewidth=0.5, alpha=0.7, color='lightgray')
     plt.xticks(rotation=45)

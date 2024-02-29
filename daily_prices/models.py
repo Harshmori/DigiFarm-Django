@@ -7,7 +7,7 @@ class Price(models.Model):
     state = models.CharField(max_length=255)
     min_price = models.DecimalField(max_digits=10,decimal_places=2)
     max_price = models.DecimalField(max_digits=10,decimal_places=2)
-    model_price = models.DecimalField(max_digits=10,decimal_places=2)
+    modal_price = models.DecimalField(max_digits=10,decimal_places=2)
     arrival_date = models.DateField()
 
     class Meta:
